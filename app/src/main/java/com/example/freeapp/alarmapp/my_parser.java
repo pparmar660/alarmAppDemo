@@ -106,31 +106,6 @@ public class my_parser {
 
     }
 
-    public String getLocatio(String str) {
 
-        String loc = "";
-
-        if (str.contains("at")) {
-            int j = 0;
-            String word[] = str.split(" ");
-
-            for (int i = 0; i < word.length; i++) {
-
-                if (word[i].equalsIgnoreCase("at")) {
-                    j = i;
-                    break;
-
-                }
-
-            }
-
-            for (int i = j; i < word.length; i++) {
-
-                loc = loc + " " + word[i];
-            }
-        }
-        return loc;
-
-    }
 
 }

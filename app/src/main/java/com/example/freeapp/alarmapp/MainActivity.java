@@ -8,6 +8,9 @@ import android.content.Intent;
 import android.speech.RecognizerIntent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,22 +29,24 @@ public class MainActivity extends AppCompatActivity {
 
     Context context;
     my_parser parse_obj;
-    TextView resultView;
+ //   TextView resultView;
     EditText editText;
-    Button button;
+   Button button;
     ImageView mikeImage;
+    AlarmAdapter alarmAdapter;
     private PendingIntent pendingIntent;
     private final int REQ_CODE_SPEECH_INPUT = 100;
     DatabaseHandler databaseHandler;
-
+    RecyclerView recyclerView;
     AlarmManager alarmManager;
+    ArrayList<AlarmModel> alarmList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
          parse_obj=  new my_parser(context);
 
-        resultView=(TextView)findViewById(R.id.restultText);
+//        resultView=(TextView)findViewById(R.id.restultText);
         editText=(EditText) findViewById(R.id.editText);
         button=(Button)findViewById(R.id.getData);
         mikeImage=(ImageView) findViewById(R.id.mikeImage);
@@ -56,15 +61,26 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                resultView.setText(parse_obj.parse_date(editText.getText().toString()).get("Start_Time"));
+                String dateAndTime=parse_obj.parse_date(editText.getText().toString()).get("Start_Time");
+                SetAlarm(dateAndTime);
 
             }
         });
+
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        alarmList=new ArrayList<>();
+
+        alarmList=databaseHandler.getListOfAllRecord();
+
+        alarmAdapter = new AlarmAdapter(alarmList,databaseHandler);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(alarmAdapter);
+
 
 
     }
@@ -96,16 +112,8 @@ public class MainActivity extends AppCompatActivity {
                     ArrayList<String> result = data
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     String dateAndTime=parse_obj.parse_date(result.get(0)).get("Start_Time");
-
-
-                    resultView.setText(dateAndTime);
                     SetAlarm(dateAndTime);
-                    //long millis = System.currentTimeMillis();
 
-                    databaseHandler.addContact(new AlarmModel(Integer.parseInt(System.currentTimeMillis()+""),
-                            "Wake Up",dateAndTime,1));
-
-                    //txtSpeechInput.setText();
                 }
                 break;
             }
@@ -130,6 +138,11 @@ public class MainActivity extends AppCompatActivity {
         Intent myIntent = new Intent(MainActivity.this, AlarmReceiver.class);
         pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, myIntent, 0);
         alarmManager.set(AlarmManager.RTC, cal.getTimeInMillis(), pendingIntent);
+
+        databaseHandler.addContact(new AlarmModel(Integer.parseInt(System.currentTimeMillis()+""),
+                "Wake Up",dateStr,1));
+        alarmList=databaseHandler.getListOfAllRecord();
+        alarmAdapter.notifyDataSetChanged();
 
     }
 

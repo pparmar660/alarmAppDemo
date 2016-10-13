@@ -41,5 +41,5 @@
         android:id="@+id/restultText"
         android:textSize="15sp"/>
 
-    
+
 </LinearLayout>

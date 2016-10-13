@@ -98,8 +98,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                  cursor.moveToNext();
              }
          }
-
          return list;
-
      }
+
+    public boolean deleteRecord(int id)
+    {   SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(TABLE_ALARMS, KEY_ID + "=" + id, null) > 0;
+    }
+
+
+    public  void updateRecord(int id, int toggel){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues data=new ContentValues();
+        data.put(KEY_Toggle,toggel);
+
+        db.update(TABLE_ALARMS, data, KEY_ID+"=" + id, null);
+    }
+
+
+
+
 }

@@ -22,6 +22,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Locale;
 
@@ -76,6 +78,8 @@ public class MainActivity extends AppCompatActivity {
         alarmList=new ArrayList<>();
 
         alarmList=databaseHandler.getListOfAllRecord();
+
+        Collections.reverse(alarmList);
 
         alarmAdapter = new AlarmAdapter(alarmList,databaseHandler);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -145,8 +149,9 @@ public class MainActivity extends AppCompatActivity {
         databaseHandler.addContact(new AlarmModel(
                 outPut.get("Event"),outPut.get("Start_Time"),1));
      //   alarmList=databaseHandler.getListOfAllRecord();
-
-        alarmList.add(new AlarmModel(alarmList.size(),
+       int lastItemId=alarmList.get(alarmList.size()-1).getId();
+        lastItemId++;
+        alarmList.add(0,new AlarmModel(lastItemId,
                 outPut.get("Event"),outPut.get("Start_Time"),1));
         alarmAdapter.notifyDataSetChanged();
 

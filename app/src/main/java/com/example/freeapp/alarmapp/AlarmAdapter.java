@@ -16,6 +16,9 @@ package com.example.freeapp.alarmapp;
         import android.widget.Switch;
         import android.widget.TextView;
 
+        import java.text.ParseException;
+        import java.text.SimpleDateFormat;
+        import java.util.Calendar;
         import java.util.List;
 
 public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.MyViewHolder> {
@@ -24,7 +27,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.MyViewHolder
     DatabaseHandler databaseHandler;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView title, dateTime;
+        public TextView title, dateTime,date;
         public ImageView crossImage;
         public Switch toggleSwitch;
 
@@ -32,6 +35,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.MyViewHolder
             super(view);
              title=(TextView)view.findViewById(R.id.title);
               dateTime=(TextView)view.findViewById(R.id.dataTime);
+            date=(TextView)view.findViewById(R.id.date);
               crossImage=(ImageView)view.findViewById(R.id.cross);
               toggleSwitch=(Switch) view.findViewById(R.id.switch1);
 
@@ -56,7 +60,24 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.MyViewHolder
     public void onBindViewHolder(MyViewHolder holder, final int position) {
         final AlarmModel model = alarmModelList.get(position);
         holder.title.setText(model.getMessage());
-        holder.dateTime.setText(model.getDateTime());
+
+
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat(MainActivity.dateFormat);
+
+        try {
+            cal.setTime(sdf.parse(model.getDateTime()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        sdf = new SimpleDateFormat("h:mm a");
+        holder.dateTime.setText(sdf.format(cal.getTime()));
+
+        sdf = new SimpleDateFormat("EEE MMM d yyyy");
+        holder.date.setText(sdf.format(cal.getTime()));
+
+
         if(model.getToggle()>0)
             holder.toggleSwitch.setChecked(true);
         else holder.toggleSwitch.setChecked(false);

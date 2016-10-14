@@ -22,6 +22,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Hashtable;
 import java.util.Locale;
 
 
@@ -39,7 +40,8 @@ public class MainActivity extends AppCompatActivity {
     DatabaseHandler databaseHandler;
     RecyclerView recyclerView;
     AlarmManager alarmManager;
-    ArrayList<AlarmModel> alarmList;
+        ArrayList<AlarmModel> alarmList;
+    public static final  String dateFormat="EEE MMM d yyyy 'at' h:mm a";//"EEE MMM dd HH:mm:ss z yyyy"
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,8 +66,8 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String dateAndTime=parse_obj.parse_date(editText.getText().toString()).get("Start_Time");
-                SetAlarm(dateAndTime);
+                Hashtable<String, String> outPut=parse_obj.parse_date(editText.getText().toString());
+                SetAlarm(outPut);
 
             }
         });
@@ -111,8 +113,10 @@ public class MainActivity extends AppCompatActivity {
 
                     ArrayList<String> result = data
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    String dateAndTime=parse_obj.parse_date(result.get(0)).get("Start_Time");
-                    SetAlarm(dateAndTime);
+
+                    Hashtable<String, String> outPut = new Hashtable<String, String>();
+                   outPut=parse_obj.parse_date(result.get(0));
+                    SetAlarm(outPut);
 
                 }
                 break;
@@ -122,14 +126,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void SetAlarm(String dateStr){
+    public void SetAlarm( Hashtable<String, String> outPut){
 
         Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat(
-                "EEE MMM dd HH:mm:ss z yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat(MainActivity.dateFormat);
 
         try {
-            cal.setTime(sdf.parse(dateStr));
+            cal.setTime(sdf.parse(outPut.get("Start_Time")));
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -139,11 +142,14 @@ public class MainActivity extends AppCompatActivity {
         pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, myIntent, 0);
         alarmManager.set(AlarmManager.RTC, cal.getTimeInMillis(), pendingIntent);
 
-        databaseHandler.addContact(new AlarmModel(Integer.parseInt(System.currentTimeMillis()+""),
-                "Wake Up",dateStr,1));
-        alarmList=databaseHandler.getListOfAllRecord();
+        databaseHandler.addContact(new AlarmModel(
+                outPut.get("Event"),outPut.get("Start_Time"),1));
+     //   alarmList=databaseHandler.getListOfAllRecord();
+
+        alarmList.add(new AlarmModel(alarmList.size(),
+                outPut.get("Event"),outPut.get("Start_Time"),1));
         alarmAdapter.notifyDataSetChanged();
 
     }
 
-}
+        }

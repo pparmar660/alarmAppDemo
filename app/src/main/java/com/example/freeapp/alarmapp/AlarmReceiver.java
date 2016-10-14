@@ -10,6 +10,11 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.content.WakefulBroadcastReceiver;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+
 public class AlarmReceiver extends WakefulBroadcastReceiver {
 
     @Override
@@ -21,6 +26,39 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         //this will sound the alarm tone
         //this will sound the alarm once, if you wish to
         //raise alarm in loop continuously then use MediaPlayer and setLooping(true)
+
+        DatabaseHandler databaseHandler=new DatabaseHandler(context);
+
+
+        Calendar calendar = Calendar.getInstance();
+
+
+        ArrayList<AlarmModel> alarmList;
+        alarmList=databaseHandler.getListOfAllRecord();
+        boolean showAlarm=false;
+        for(int i=0;i<alarmList.size();i++)
+        {  AlarmModel model=alarmList.get(i);
+
+            Calendar cal = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat(MainActivity.dateFormat);
+            try {
+                cal.setTime(sdf.parse(model.getDateTime()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            String time1=sdf.format(calendar.getTime());
+            String time2=model.getDateTime();
+
+
+            if(time1.equalsIgnoreCase(time2)){
+                if(model.getToggle()>0) showAlarm=true;
+            }
+        }
+
+         if(!showAlarm)
+             return;
+
         Uri alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         if (alarmUri == null) {
             alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);

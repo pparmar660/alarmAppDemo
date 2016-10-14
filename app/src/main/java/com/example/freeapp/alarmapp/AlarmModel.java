@@ -9,16 +9,24 @@ import android.content.Intent;
 public class AlarmModel {
 
     String message,dateTime;
-    int id,toggle;
-
+    int id,toggle=0;
+     AlarmModel(){}
 
      AlarmModel(int id, String message,String dateTime,int toggle){
 
-         this.id=id;
-         this.message=message;
-         this.dateTime=dateTime;
-         this.toggle=toggle;
-     }
+        this.id=id;
+        this.message=message;
+        this.dateTime=dateTime;
+        this.toggle=toggle;
+    }
+
+
+    AlarmModel(String message,String dateTime,int toggle){
+
+        this.message=message;
+        this.dateTime=dateTime;
+        this.toggle=toggle;
+    }
 
     public String getMessage() {
         return message;

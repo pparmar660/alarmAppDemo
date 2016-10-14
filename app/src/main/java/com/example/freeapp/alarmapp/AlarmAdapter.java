@@ -11,6 +11,7 @@ package com.example.freeapp.alarmapp;
         import android.view.LayoutInflater;
         import android.view.View;
         import android.view.ViewGroup;
+        import android.widget.CompoundButton;
         import android.widget.ImageView;
         import android.widget.Switch;
         import android.widget.TextView;
@@ -56,17 +57,33 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.MyViewHolder
         final AlarmModel model = alarmModelList.get(position);
         holder.title.setText(model.getMessage());
         holder.dateTime.setText(model.getDateTime());
+        if(model.getToggle()>0)
+            holder.toggleSwitch.setChecked(true);
+        else holder.toggleSwitch.setChecked(false);
         holder.crossImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                  databaseHandler.deleteRecord(model.getId());
-                alarmModelList.remove(position);
+                 if(alarmModelList.size()>(position)) {
+                     alarmModelList.remove((position));
+                 }
                  notifyItemRemoved(position);
+            }
+        });
+
+        holder.toggleSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    databaseHandler.updateRecord(model.getId(),1);
+                }
+                else  databaseHandler.updateRecord(model.getId(),0);
             }
         });
 
 
     }
+
+
 
     @Override
     public int getItemCount() {

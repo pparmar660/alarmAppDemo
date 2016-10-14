@@ -22,13 +22,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "myAlarmApp";
 
     // Contacts table name
-    private static final String TABLE_ALARMS = "alarms";
+    public static final String TABLE_ALARMS = "alarms";
 
     // Contacts Table Columns names
-    private static final String KEY_ID = "id";
-    private static final String KEY_MESSAGE = "message";
-    private static final String KEY_DATE_TIME = "dataTime";
-    private  static final  String KEY_Toggle="toggle";
+    public static final String KEY_ID = "id";
+    public static final String KEY_MESSAGE = "message";
+    public static final String KEY_DATE_TIME = "dataTime";
+    public  static final  String KEY_Toggle="toggle";
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -37,7 +37,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_ALARMS + "("
-                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_MESSAGE + " TEXT,"
+                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + KEY_MESSAGE + " TEXT,"
                 + KEY_DATE_TIME + " TEXT," +KEY_Toggle+" INTEGER "+ ")";
         db.execSQL(CREATE_CONTACTS_TABLE);
     }
@@ -56,7 +56,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_ID, model.getId()); // Contact Name
+       // Contact Name
         values.put(KEY_MESSAGE, model.getMessage()); // Contact Phone Number
         values.put(KEY_DATE_TIME, model.getDateTime());
         values.put(KEY_Toggle, model.getToggle());
@@ -78,6 +78,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         AlarmModel alarmModel = new AlarmModel(Integer.parseInt(cursor.getString(0)),
                 cursor.getString(1), cursor.getString(2),Integer.parseInt(cursor.getString(3)));
         // return contact
+        return alarmModel;
+    }
+
+
+    public AlarmModel getAlarmUsingRawQuery(String query) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        AlarmModel alarmModel=new AlarmModel();
+
+        Cursor  cursor = db.rawQuery(query,null);
+        if (cursor != null)
+            if(cursor.moveToFirst()) {
+
+                 alarmModel = new AlarmModel(Integer.parseInt(cursor.getString(0)),
+                        cursor.getString(1), cursor.getString(2), Integer.parseInt(cursor.getString(3)));
+                // return contact
+            }
         return alarmModel;
     }
 

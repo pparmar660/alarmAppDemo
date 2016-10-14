@@ -75,8 +75,7 @@ public class my_parser {
 
             Calendar c = Calendar.getInstance();
             Date my_dat = dateList.get(0);
-            SimpleDateFormat df = new SimpleDateFormat(
-                    "EEE MMM dd HH:mm:ss z yyyy");
+            SimpleDateFormat df = new SimpleDateFormat(MainActivity.dateFormat);
 
             date = df.format(my_dat.getTime());
 

@@ -12,6 +12,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
          parse_obj=  new my_parser(context);
 
-//        resultView=(TextView)findViewById(R.id.restultText);
+   //     resultView=(TextView)findViewById(R.id.restultText);
         editText=(EditText) findViewById(R.id.editText);
         button=(Button)findViewById(R.id.getData);
         mikeImage=(ImageView) findViewById(R.id.mikeImage);
@@ -68,8 +69,14 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Hashtable<String, String> outPut=parse_obj.parse_date(editText.getText().toString());
-                SetAlarm(outPut);
+                if(editText.getText().toString().length()>0) {
+                    Hashtable<String, String> outPut = parse_obj.parse_date(editText.getText().toString());
+                    SetAlarm(outPut);
+                    editText.setText("");
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+
+                }
 
             }
         });
@@ -149,8 +156,11 @@ public class MainActivity extends AppCompatActivity {
         databaseHandler.addContact(new AlarmModel(
                 outPut.get("Event"),outPut.get("Start_Time"),1));
      //   alarmList=databaseHandler.getListOfAllRecord();
-       int lastItemId=alarmList.get(alarmList.size()-1).getId();
-        lastItemId++;
+       int lastItemId=1;
+        if(alarmList.size()>0) {
+            alarmList.get(alarmList.size() - 1).getId();
+            lastItemId++;
+        }
         alarmList.add(0,new AlarmModel(lastItemId,
                 outPut.get("Event"),outPut.get("Start_Time"),1));
         alarmAdapter.notifyDataSetChanged();

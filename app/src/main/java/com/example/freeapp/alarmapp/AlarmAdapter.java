@@ -87,8 +87,13 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.MyViewHolder
                  databaseHandler.deleteRecord(model.getId());
                  if(alarmModelList.size()>(position)) {
                      alarmModelList.remove((position));
+                     notifyItemRemoved(position);
+                 }else {
+                     if(alarmModelList.size()==1) {
+                         alarmModelList.remove((0));
+                         notifyItemRemoved(0);
+                     }
                  }
-                 notifyItemRemoved(position);
             }
         });
 
